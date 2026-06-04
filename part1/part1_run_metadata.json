@@ -1,0 +1,42 @@
+{
+  "args": {
+    "actor_critic_mode": "episode",
+    "actor_critic_update": "returns",
+    "algorithm": "all",
+    "baseline": null,
+    "best_metric": "reward",
+    "entropy_coef": 0.0,
+    "episodes": 300,
+    "eval_episodes": 5,
+    "eval_every": 25000,
+    "gamma": 0.99,
+    "hidden_size": 256,
+    "init_method": "normal",
+    "init_sigma": 0.5,
+    "learning_rate": 0.001,
+    "max_grad_norm": null,
+    "n_envs": 8,
+    "normalize_advantages": false,
+    "normalize_observations": false,
+    "output_prefix": "part1",
+    "print_every": 1,
+    "rollout_steps": 32,
+    "save_best_path": "best_actor_critic_policy.pth",
+    "save_final_path": "final_actor_critic_policy.pth",
+    "seed": 42,
+    "squash_action_mean": false,
+    "timesteps": 300000,
+    "value_coef": 0.5
+  },
+  "argv": [
+    "train.py"
+  ],
+  "cwd": "/Users/canberk/Desktop/Fundamentals of Artificial Intelligence, Machine and Deep Learning/Reinforcement Learning Project/FAIML-RL-26/part1",
+  "runtime_versions": {
+    "gymnasium_version": "1.2.3",
+    "mujoco_version": "3.8.1",
+    "numpy_version": "1.26.4",
+    "python_version": "3.10.20",
+    "torch_version": "2.12.0"
+  }
+}

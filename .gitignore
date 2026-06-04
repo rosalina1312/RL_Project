@@ -1,0 +1,13 @@
+.DS_Store
+__pycache__/
+*.py[cod]
+
+part2/tb_logs/
+part2/wandb/
+part2/wandb_models/
+part2/panda-gym/panda_gym.egg-info/
+.mplconfig/
+__pycache__/
+*.pyc
+.mplconfig/
+.DS_Store

@@ -1,0 +1,52 @@
+{
+  "args": {
+    "adr_initial_max": 1.2,
+    "adr_initial_min": 0.8,
+    "adr_max_limit": 4.0,
+    "adr_step": 0.2,
+    "adr_success_threshold": 0.7,
+    "adr_window_size": 20,
+    "algo": "ppo",
+    "env_type": "target",
+    "gamma": 0.95,
+    "learning_rate": 0.0003,
+    "load_model_path": null,
+    "mass_max": 4.0,
+    "mass_min": 0.5,
+    "ppo_batch_size": 64,
+    "ppo_n_steps": 1024,
+    "print_masses": false,
+    "progress_bar": false,
+    "quiet": false,
+    "run_name": null,
+    "sac_batch_size": 256,
+    "sac_buffer_size": 100000,
+    "sampling_strategy": "none",
+    "seed": 42,
+    "timesteps": 200000,
+    "use_wandb": false,
+    "wandb_project": "faiml-rl-panda-push"
+  },
+  "argv": [
+    "train_sb3.py",
+    "--algo",
+    "ppo",
+    "--env-type",
+    "target",
+    "--sampling-strategy",
+    "none",
+    "--timesteps",
+    "200000"
+  ],
+  "cwd": "/Users/canberk/Desktop/Fundamentals of Artificial Intelligence, Machine and Deep Learning/Reinforcement Learning Project/FAIML-RL-26/part2",
+  "model_path": "models/ppo_push_none_target_200k_lr0p0003_g0p95_n1024_b64_fixed_seed42.zip",
+  "run_name": "ppo_push_none_target_200k_lr0p0003_g0p95_n1024_b64_fixed_seed42",
+  "runtime_versions": {
+    "gymnasium_version": "1.2.3",
+    "numpy_version": "1.26.4",
+    "panda_gym_version": "3.0.8",
+    "python_version": "3.10.20",
+    "stable_baselines3_version": "2.8.0",
+    "torch_version": "2.12.0"
+  }
+}
