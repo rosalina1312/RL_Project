@@ -10,26 +10,6 @@ import pandas as pd
 CSV_PATH = "results/eval_results.csv"
 OUT_DIR = "results"
 
-DR_TARGET_RESULTS = [
-    ("PPO ADR", 0.260, -3.2035181522369385),
-    ("PPO UDR [0.5, 5.0]", 0.185, -3.5629554986953735),
-    ("PPO UDR [0.8, 3.0]", 0.160, -3.7178163528442383),
-    ("SAC ADR 200k", 0.300, -3.065),
-    ("SAC ADR 500k", 1.000, -0.407),
-    ("SAC UDR 200k", 0.660, -1.7757229804992676),
-    ("SAC UDR 500k", 1.000, -0.339),
-]
-
-DR_MASS_RESULTS = [
-    ("PPO ADR adaptive", [0.14, 0.30, 0.30, 0.18, 0.18]),
-    ("PPO UDR [0.5, 5.0]", [0.08, 0.14, 0.26, 0.20, 0.18]),
-    ("PPO UDR [0.8, 3.0]", [0.16, 0.30, 0.16, 0.28, 0.16]),
-    ("SAC ADR 200k", [0.30, 0.30, 0.30, 0.30, 0.30]),
-    ("SAC ADR 500k", [0.98, 1.00, 1.00, 1.00, 1.00]),
-    ("SAC UDR 200k", [0.64, 0.64, 0.64, 0.70, 0.66]),
-    ("SAC UDR 500k", [1.00, 1.00, 1.00, 1.00, 1.00]),
-]
-
 
 def clean_label(name):
     if "ppo_none_source_to_source" in name:
@@ -44,14 +24,20 @@ def clean_label(name):
         return "SAC source->target"
     if "sac_none_target_to_target" in name:
         return "SAC target->target"
-    if "ppo_udr" in name:
-        return "PPO UDR"
-    if "ppo_adr" in name:
-        return "PPO ADR adaptive"
+    # if "ppo_udr" in name:
+    #     return "PPO UDR 200k"
+    # if "ppo_adr" in name:
+    #     return "PPO ADR 200k"
+    if "sac_udr_500k" in name:
+        return "SAC UDR 500k"
+    if "sac_adr_500k" in name:
+        return "SAC ADR 500k"
+    if "sac_adr_200k" in name:
+        return "SAC ADR 200k"
     if "sac_udr" in name:
-        return "SAC UDR"
-    if "sac_adr" in name:
-        return "SAC ADR adaptive"
+        return "SAC UDR 200k"
+    # if "sac_adr" in name:
+    #     return "SAC ADR 200k (orig.)"
     if "udr_v2" in name:
         return "PPO UDR [0.8, 3.0]"
     if "udr_v3" in name:
@@ -70,9 +56,22 @@ def main():
     df["mean_return"] = pd.to_numeric(df["mean_return"], errors="coerce")
     df["eval_mass"] = pd.to_numeric(df["eval_mass"], errors="coerce")
 
-    target_summary = pd.DataFrame(
-        DR_TARGET_RESULTS,
-        columns=["label", "success_rate", "mean_return"],
+    target_df = df[
+        (df["env_type"] == "target") &
+        (df["eval_mass"].isna()) &
+        (df["experiment_name"].str.contains("udr_v2|udr_v3|adr_v2|ppo_udr|ppo_adr|sac_udr|sac_adr", regex=True))
+    ].copy()
+
+    target_df["label"] = target_df["experiment_name"].apply(clean_label)
+    target_df = target_df[~target_df["label"].str.contains("orig\.", na=False)]
+
+    target_summary = (
+        target_df
+        .groupby("label", as_index=False)
+        .agg(
+            success_rate=("success_rate", "mean"),
+            mean_return=("mean_return", "mean"),
+        )
     )
 
     print("\n=== Target summary ===")
@@ -84,7 +83,7 @@ def main():
     plt.xlabel("Method")
     plt.title("Domain Randomization: Target Success Rate")
     plt.bar_label(bars, fmt="%.1f%%", padding=3)
-    plt.ylim(0, 100)
+    plt.ylim(0, 115)
     plt.xticks(rotation=20, ha="right")
     plt.tight_layout()
     plt.savefig("results/domain_randomization_target_barplot.png", dpi=300)
@@ -100,12 +99,18 @@ def main():
     plt.savefig("results/mean_return_barplot.png", dpi=300)
     plt.close()
 
-    mass_summary = pd.DataFrame(
-        [
-            {"label": label, "eval_mass": float(mass), "success_rate": success}
-            for label, values in DR_MASS_RESULTS
-            for mass, success in zip([1, 2, 3, 4, 5], values)
-        ]
+    mass_df = df[
+        (df["eval_mass"].notna()) &
+        (df["experiment_name"].str.contains("udr_v2|udr_v3|adr_v2|ppo_udr|ppo_adr|sac_udr|sac_adr", regex=True))
+    ].copy()
+
+    mass_df["label"] = mass_df["experiment_name"].apply(clean_label)
+    mass_df = mass_df[~mass_df["label"].str.contains("orig\.", na=False)]
+
+    mass_summary = (
+        mass_df
+        .groupby(["label", "eval_mass"], as_index=False)
+        .agg(success_rate=("success_rate", "mean"))
     )
 
     print("\n=== Mass robustness summary ===")
