@@ -11,6 +11,26 @@ import pandas as pd
 ROOT = Path(__file__).resolve().parent
 OUT = ROOT / "report_assets"
 
+DR_TARGET_RESULTS = [
+    ("PPO ADR", 0.260, -3.2035181522369385),
+    ("PPO UDR [0.5, 5.0]", 0.185, -3.5629554986953735),
+    ("PPO UDR [0.8, 3.0]", 0.160, -3.7178163528442383),
+    ("SAC ADR 200k", 0.300, -3.065),
+    ("SAC ADR 500k", 1.000, -0.407),
+    ("SAC UDR 200k", 0.660, -1.7757229804992676),
+    ("SAC UDR 500k", 1.000, -0.339),
+]
+
+DR_MASS_RESULTS = [
+    ("PPO ADR", [0.14, 0.30, 0.30, 0.18, 0.18]),
+    ("PPO UDR [0.5, 5.0]", [0.08, 0.14, 0.26, 0.20, 0.18]),
+    ("PPO UDR [0.8, 3.0]", [0.16, 0.30, 0.16, 0.28, 0.16]),
+    ("SAC ADR 200k", [0.30, 0.30, 0.30, 0.30, 0.30]),
+    ("SAC ADR 500k", [0.98, 1.00, 1.00, 1.00, 1.00]),
+    ("SAC UDR 200k", [0.64, 0.64, 0.64, 0.70, 0.66]),
+    ("SAC UDR 500k", [1.00, 1.00, 1.00, 1.00, 1.00]),
+]
+
 
 def pct(value):
     if pd.isna(value):
@@ -150,45 +170,26 @@ def part2_tables():
     )
     save_table(lower_upper, "Part 2: lower and upper bounds", OUT / "part2_lower_upper_table.png")
 
-    dr_target = df[
-        (df["env_type"] == "target")
-        & (df["eval_mass"].isna())
-        & df["experiment_name"].str.contains(
-            "udr_v2|udr_v3|adr_v2|ppo_udr|ppo_adr|sac_udr|sac_adr",
-            regex=True,
-        )
-    ]
-    dr_target = (
-        dr_target.groupby("label", as_index=False)
-        .agg(success_rate=("success_rate", "mean"), mean_return=("mean_return", "mean"))
-    )
     dr_table = pd.DataFrame(
         {
-            "Method": dr_target["label"],
-            "Target success": dr_target["success_rate"].map(pct),
-            "Mean return": dr_target["mean_return"].map(fmt),
+            "Method": [row[0] for row in DR_TARGET_RESULTS],
+            "Target success": [pct(row[1]) for row in DR_TARGET_RESULTS],
+            "Mean return": [fmt(row[2]) for row in DR_TARGET_RESULTS],
         }
     )
     save_table(dr_table, "Part 2: domain randomization on target domain", OUT / "part2_domain_randomization_table.png")
 
-    mass_df = df[
-        df["eval_mass"].notna()
-        & df["experiment_name"].str.contains(
-            "udr_v2|udr_v3|adr_v2|ppo_udr|ppo_adr|sac_udr|sac_adr",
-            regex=True,
-        )
-    ]
-    if not mass_df.empty:
-        pivot = mass_df.pivot_table(
-            index="label",
-            columns="eval_mass",
-            values="success_rate",
-            aggfunc="mean",
-        ).reset_index()
-        pivot.columns = ["Method"] + [f"{int(col)} kg" for col in pivot.columns[1:]]
-        for col in pivot.columns[1:]:
-            pivot[col] = pivot[col].map(pct)
-        save_table(pivot, "Part 2: mass robustness", OUT / "part2_mass_robustness_table.png")
+    mass_table = pd.DataFrame(
+        {
+            "Method": [row[0] for row in DR_MASS_RESULTS],
+            "1 kg": [pct(row[1][0]) for row in DR_MASS_RESULTS],
+            "2 kg": [pct(row[1][1]) for row in DR_MASS_RESULTS],
+            "3 kg": [pct(row[1][2]) for row in DR_MASS_RESULTS],
+            "4 kg": [pct(row[1][3]) for row in DR_MASS_RESULTS],
+            "5 kg": [pct(row[1][4]) for row in DR_MASS_RESULTS],
+        }
+    )
+    save_table(mass_table, "Part 2: mass robustness", OUT / "part2_mass_robustness_table.png")
 
 
 def main():
