@@ -37,26 +37,20 @@ def label_for(name):
         return "SAC source to target"
     if "sac_none_target_to_target" in name:
         return "SAC target to target"
-    # if "ppo_udr" in name:
-    #     return "PPO UDR 200k"
-    # if "ppo_adr" in name:
-    #     return "PPO ADR 200k"
-    if "sac_udr_500k" in name:
-        return "SAC UDR 500k"
-    if "sac_adr_500k" in name:
-        return "SAC ADR 500k"
-    if "sac_adr_200k" in name:
-        return "SAC ADR 200k"
-    if "sac_udr" in name:
-        return "SAC UDR 200k"
-    # if "sac_adr" in name:
-    #     return "SAC ADR 200k (orig.)"
     if "udr_v2" in name:
         return "PPO UDR [0.8, 3.0]"
     if "udr_v3" in name:
         return "PPO UDR [0.5, 5.0]"
-    if "adr_v2" in name:
+    if "ppo_adr" in name or "adr_v2" in name:
         return "PPO ADR"
+    if "sac_udr_500k" in name:
+        return "SAC UDR 500k"
+    if "sac_udr" in name:
+        return "SAC UDR 200k"
+    if "sac_adr_500k" in name:
+        return "SAC ADR 500k"
+    if "sac_adr" in name:
+        return "SAC ADR 200k"
     return name
 
 
@@ -194,7 +188,7 @@ def part2_tables():
     df["mean_return"] = pd.to_numeric(df["mean_return"], errors="coerce")
     df["eval_mass"] = pd.to_numeric(df["eval_mass"], errors="coerce")
     df["label"] = df["experiment_name"].map(label_for)
-    df = df[~df["label"].str.contains("orig\.", na=False)]
+    df = df[~df["label"].str.contains(r"orig\.|ppo_udr_target_new", na=False)]
 
     lower_upper = df[
         df["experiment_name"].str.contains(

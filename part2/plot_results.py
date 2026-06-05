@@ -26,24 +26,24 @@ def clean_label(name):
         return "SAC target->target"
     # if "ppo_udr" in name:
     #     return "PPO UDR 200k"
-    # if "ppo_adr" in name:
-    #     return "PPO ADR 200k"
-    if "sac_udr_500k" in name:
-        return "SAC UDR 500k"
-    if "sac_adr_500k" in name:
-        return "SAC ADR 500k"
-    if "sac_adr_200k" in name:
-        return "SAC ADR 200k"
-    if "sac_udr" in name:
-        return "SAC UDR 200k"
-    # if "sac_adr" in name:
-    #     return "SAC ADR 200k (orig.)"
     if "udr_v2" in name:
         return "PPO UDR [0.8, 3.0]"
     if "udr_v3" in name:
         return "PPO UDR [0.5, 5.0]"
-    if "adr_v2" in name:
-        return "PPO ADR adaptive"
+    if "ppo_adr" in name or "adr_v2" in name:
+        return "PPO ADR"
+    if "sac_udr_500k" in name:
+        return "SAC UDR 500k"
+    if "sac_udr" in name:
+        return "SAC UDR 200k"
+    if "sac_adr_500k" in name:
+        return "SAC ADR 500k"
+    if "sac_adr" in name:
+        return "SAC ADR 200k"
+    # if "sac_adr" in name:
+    #     return "SAC ADR 200k (orig.)"
+    # if "adr_v2" in name:
+    #     return "PPO ADR adaptive"
     return name
 
 
@@ -63,7 +63,7 @@ def main():
     ].copy()
 
     target_df["label"] = target_df["experiment_name"].apply(clean_label)
-    target_df = target_df[~target_df["label"].str.contains("orig\.", na=False)]
+    target_df = target_df[~target_df["label"].str.contains(r"orig\.|ppo_udr_target_new", na=False)]
 
     target_summary = (
         target_df
